@@ -1,0 +1,151 @@
+/* =========================================
+   1. BIẾN MÀU SẮC & FONT CHỮ (VARIABLES)
+========================================= */
+:root {
+    --bs-primary: #0F5C4D;      /* Xanh mòng két đậm - Chủ đạo */
+    --color-green: #2E8B57;     /* Xanh lá - Điểm nhấn */
+    --color-light-mint: #DDF5EA;/* Mint nhạt - Nền xen kẽ */
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    color: #333;
+    overflow-x: hidden; /* Ngăn cuộn ngang ngoài ý muốn */
+}
+
+/* Kiểu dáng Tiêu đề */
+h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading);
+    color: var(--bs-primary);
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -1px;
+    margin-bottom: 1.5rem;
+}
+
+/* =========================================
+   2. TIỆN ÍCH TÙY CHỈNH (CUSTOM UTILITIES)
+========================================= */
+.bg-light-mint {
+    background-color: var(--color-light-mint);
+}
+
+.text-primary { color: var(--bs-primary) !important; }
+.border-primary { border-color: var(--color-green) !important; }
+
+/* Tùy chỉnh Nút bấm (Ghi đè mặc định của Bootstrap) */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: var(--color-green);
+    border-color: var(--color-green);
+    transform: translateY(-2px); /* Hiệu ứng nảy nhẹ khi trỏ chuột */
+    box-shadow: 0 4px 10px rgba(46, 139, 87, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   3. THANH ĐIỀU HƯỚNG & LOGO NỔI BẬT
+========================================= */
+.navbar {
+    transition: all 0.3s ease;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(10px);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Logo DramaSoft nổi bật */
+.logo-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.logo-img {
+    height: 65px;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    filter: drop-shadow(0 4px 6px rgba(15, 92, 77, 0.2)); /* Đổ bóng nhẹ */
+}
+
+.logo-wrapper:hover .logo-img {
+    transform: scale(1.08); /* Phóng to nhẹ */
+    filter: drop-shadow(0 8px 15px rgba(46, 139, 87, 0.5)); /* Sáng bóng lên khi hover */
+}
+
+.icon-link { transition: color 0.3s; }
+.icon-link:hover i { color: var(--color-green) !important; }
+
+/* =========================================
+   4. HIỆU ỨNG HOVER CHO HÌNH ẢNH
+========================================= */
+.image-wrapper {
+    overflow: hidden;
+    position: relative;
+}
+
+.image-wrapper img {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: block;
+}
+
+.hover-zoom:hover img {
+    transform: scale(1.05); /* Zoom 5% khi trỏ chuột vào ảnh */
+}
+
+.hover-zoom-slow img {
+    transition: transform 10s ease; /* Zoom cực chậm, mượt mà cho Banner chính */
+}
+.hover-zoom-slow:hover img {
+    transform: scale(1.1);
+}
+
+/* =========================================
+   5. FOOTER LÀM ĐẸP
+========================================= */
+.hover-primary {
+    transition: color 0.3s ease;
+}
+.hover-primary:hover {
+    color: var(--bs-primary) !important; /* Đổi màu chữ xanh khi trỏ chuột ở Footer */
+}
+
+/* =========================================
+   6. RESPONSIVE (ĐIỀU CHỈNH CHO MOBILE/TABLET)
+========================================= */
+@media (max-width: 991px) {
+    .section-title { font-size: 2.2rem; }
+    .logo-img { height: 50px; } /* Thu nhỏ logo trên Mobile */
+    .navbar-collapse {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+        margin-top: 10px;
+    }
+}

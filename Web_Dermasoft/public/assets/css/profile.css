@@ -1,0 +1,44 @@
+/* =========================================
+   GIAO DIỆN TRANG HỒ SƠ CÁ NHÂN (PROFILE)
+========================================= */
+
+/* 1. Tùy chỉnh Sidebar Menu (Nav Pills) */
+.custom-nav-pills .nav-link {
+    color: var(--color-gray, #6B7280); /* Fallback màu xám nếu không nhận biến */
+    transition: all 0.3s ease;
+}
+
+.custom-nav-pills .nav-link:hover {
+    background-color: var(--color-light-mint, #DDF5EA);
+    color: var(--bs-primary, #0F5C4D);
+}
+
+.custom-nav-pills .nav-link.active {
+    background-color: var(--bs-primary, #0F5C4D);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(15, 92, 77, 0.2);
+}
+
+/* 2. Tùy chỉnh Form Nhập liệu (Input Focus) */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(46, 139, 87, 0.15);
+    border-color: var(--bs-primary, #0F5C4D) !important;
+}
+
+/* 3. Thiết kế Lộ trình Hạng Thành Viên (Membership Tracker) */
+.membership-tracker .tier-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.membership-tracker .tier-step.current .tier-icon {
+    transform: scale(1.2); /* Phóng to hạng thẻ hiện tại để nhấn mạnh */
+}
+
+/* 4. Màu sắc các hạng thẻ thành viên */
+.bg-danger { background-color: #e63946 !important; } /* Thẻ Đỏ */
+.bg-secondary { background-color: #adb5bd !important; } /* Thẻ Bạc */
+.bg-warning { background-color: #ffb703 !important; } /* Thẻ Vàng Gold */
+.bg-dark { background-color: #212529 !important; } /* Thẻ Đen Kim Cương */

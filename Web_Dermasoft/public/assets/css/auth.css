@@ -1,0 +1,151 @@
+/* =========================================
+   AUTH PAGES (LOGIN / REGISTER / FORGOT)
+========================================= */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(221, 245, 234, 0.9) 0%,
+      rgba(221, 245, 234, 0) 35%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(46, 139, 87, 0.12) 0%,
+      rgba(46, 139, 87, 0) 42%
+    ),
+    #f7faf8;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 7rem 0 3rem;
+}
+
+.auth-card {
+  border: 0;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 45px rgba(15, 92, 77, 0.12);
+  overflow: hidden;
+}
+
+.auth-card .card-body {
+  padding: 2rem;
+}
+
+.auth-eyebrow {
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: #2e8b57;
+  font-weight: 600;
+}
+
+.auth-title {
+  font-family: var(--font-heading);
+  color: var(--bs-primary);
+  margin-bottom: 0.75rem;
+}
+
+.auth-hint {
+  color: #5f6b66;
+  margin-bottom: 1.5rem;
+}
+
+.auth-separator {
+  width: 68px;
+  height: 4px;
+  background: linear-gradient(90deg, #0f5c4d, #2e8b57);
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+}
+
+.auth-card .form-control {
+  border: 1px solid rgba(15, 92, 77, 0.25);
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+}
+
+.auth-card .form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(15, 92, 77, 0.12);
+}
+
+.auth-alt-link {
+  font-weight: 600;
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+.auth-alt-link:hover {
+  color: var(--color-green);
+}
+
+.auth-brand-box {
+  background: linear-gradient(
+    160deg,
+    rgba(221, 245, 234, 0.75),
+    rgba(221, 245, 234, 0.25)
+  );
+  border-left: 1px solid rgba(15, 92, 77, 0.08);
+  height: 100%;
+}
+
+.auth-brand-content {
+  text-align: center;
+}
+
+.auth-brand-logo {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 1rem;
+  padding: 0.65rem 1rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 92, 77, 0.12);
+  border-radius: 1rem;
+  box-shadow: 0 10px 22px rgba(15, 92, 77, 0.12);
+  animation: authLogoFloat 3.2s ease-in-out infinite;
+}
+
+.auth-brand-list li {
+  margin-bottom: 0.75rem;
+  color: #496056;
+}
+
+.auth-brand-list {
+  display: inline-block;
+  text-align: left;
+}
+
+@keyframes authLogoFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 991px) {
+  .auth-main {
+    padding-top: 6rem;
+  }
+
+  .auth-brand-box {
+    border-left: 0;
+    border-top: 1px solid rgba(15, 92, 77, 0.08);
+  }
+
+  .auth-brand-logo {
+    width: 150px;
+  }
+}
