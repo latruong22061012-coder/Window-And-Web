@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phân Tích Hệ Thống – Phòng Khám Da Liễu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2540;
+    --border: #1e3a5f;
+    --accent: #0ea5e9;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --pink: #ec4899;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ========== HEADER ========== */
+  .header {
+    background: linear-gradient(135deg, #0a0f1e 0%, #0c1a3a 50%, #0a0f1e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(14,165,233,0.4);
+  }
+
+  .header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+  .header p { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .badge-row { margin-left: auto; display: flex; gap: 8px; }
+  .badge {
+    padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+    border: 1px solid;
+  }
+  .badge-blue { background: rgba(14,165,233,0.1); border-color: var(--accent); color: var(--accent); }
+  .badge-green { background: rgba(16,185,129,0.1); border-color: var(--green); color: var(--green); }
+  .badge-purple { background: rgba(139,92,246,0.1); border-color: var(--purple); color: var(--purple); }
+
+  /* ========== NAV TABS ========== */
+  .nav {
+    display: flex; gap: 4px;
+    padding: 16px 40px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .nav-btn {
+    padding: 10px 20px; border: none; cursor: pointer;
+    background: transparent; color: var(--muted);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    border-radius: 8px 8px 0 0;
+  }
+  .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(14,165,233,0.08); }
+
+  /* ========== CONTENT ========== */
+  .content { padding: 32px 40px; max-width: 1600px; margin: 0 auto; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ========== SECTION ========== */
+  .section-title {
+    font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::before {
+    content: ''; display: block;
+    width: 4px; height: 20px; border-radius: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  }
+  .section-desc { color: var(--muted); font-size: 0.84rem; margin-bottom: 24px; }
+
+  /* ========== FLOW DIAGRAM ========== */
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .flow-col { display: flex; flex-direction: column; gap: 10px; }
+
+  .flow-col-title {
+    text-align: center; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 8px;
+    border-radius: 6px; margin-bottom: 4px;
+  }
+
+  .col-login .flow-col-title { background: rgba(14,165,233,0.15); color: var(--accent); border: 1px solid rgba(14,165,233,0.3); }
+  .col-admin .flow-col-title { background: rgba(139,92,246,0.15); color: var(--purple); border: 1px solid rgba(139,92,246,0.3); }
+  .col-doctor .flow-col-title { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .col-reception .flow-col-title { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+
+  .flow-box {
+    border-radius: 10px; padding: 12px 14px;
+    border: 1px solid; cursor: pointer;
+    transition: all 0.2s; position: relative;
+    background: var(--surface);
+  }
+  .flow-box:hover { transform: translateY(-2px); box-shadow: var(--card-shadow); }
+
+  .flow-box.start {
+    background: linear-gradient(135deg, rgba(14,165,233,0.2), rgba(6,182,212,0.1));
+    border-color: var(--accent);
+    text-align: center;
+  }
+  .flow-box.admin-box { border-color: rgba(139,92,246,0.4); }
+  .flow-box.admin-box:hover { border-color: var(--purple); background: rgba(139,92,246,0.08); }
+  .flow-box.doctor-box { border-color: rgba(16,185,129,0.4); }
+  .flow-box.doctor-box:hover { border-color: var(--green); background: rgba(16,185,129,0.08); }
+  .flow-box.reception-box { border-color: rgba(245,158,11,0.4); }
+  .flow-box.reception-box:hover { border-color: var(--yellow); background: rgba(245,158,11,0.08); }
+  .flow-box.shared-box { border-color: rgba(236,72,153,0.4); }
+  .flow-box.shared-box:hover { border-color: var(--pink); background: rgba(236,72,153,0.08); }
+
+  .flow-box-title {
+    font-size: 0.82rem; font-weight: 700; margin-bottom: 2px;
+  }
+  .flow-box-sub {
+    font-size: 0.7rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  }
+  .flow-box-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .flow-tag {
+    font-size: 0.62rem; padding: 2px 6px; border-radius: 4px;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .tag-trigger { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .tag-sp { background: rgba(14,165,233,0.15); color: #7dd3fc; }
+  .tag-view { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .tag-tx { background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .tag-crud { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+
+  /* ========== ARROW FLOW ========== */
+  .main-flow {
+    display: flex; flex-direction: column; gap: 0;
+    margin-bottom: 40px;
+  }
+
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 0;
+    position: relative;
+  }
+
+  .step-connector {
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 48px; padding-top: 20px;
+  }
+
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800;
+    position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .step-line {
+    width: 2px; height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+    flex: 1;
+    min-height: 20px;
+  }
+
+  .step-content {
+    flex: 1; padding: 16px; margin-left: 12px; margin-bottom: 16px;
+    background: var(--surface);
+    border-radius: 12px; border: 1px solid var(--border);
+  }
+
+  .step-title {
+    font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .step-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; line-height: 1.7; }
+
+  .step-detail {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px; margin-top: 10px;
+  }
+
+  .detail-card {
+    background: var(--surface2); border-radius: 8px; padding: 10px 12px;
+    border: 1px solid var(--border); font-size: 0.78rem;
+  }
+  .detail-card-title { font-weight: 700; margin-bottom: 4px; font-size: 0.8rem; }
+  .detail-card ul { padding-left: 14px; color: var(--muted); }
+  .detail-card ul li { margin-bottom: 2px; }
+  .detail-card code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent2);
+    background: rgba(6,182,212,0.1); padding: 1px 4px; border-radius: 3px;
+  }
+
+  /* ========== UI MAP ========== */
+  .role-section { margin-bottom: 40px; }
+  .role-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    padding: 14px 20px; border-radius: 10px;
+  }
+  .role-header.admin-h { background: linear-gradient(135deg, rgba(139,92,246,0.15), transparent); border: 1px solid rgba(139,92,246,0.3); }
+  .role-header.doctor-h { background: linear-gradient(135deg, rgba(16,185,129,0.15), transparent); border: 1px solid rgba(16,185,129,0.3); }
+  .role-header.reception-h { background: linear-gradient(135deg, rgba(245,158,11,0.15), transparent); border: 1px solid rgba(245,158,11,0.3); }
+
+  .role-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .role-header h3 { font-size: 1rem; font-weight: 800; }
+  .role-header p { font-size: 0.78rem; color: var(--muted); }
+  .role-count {
+    margin-left: auto; font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .screen-card {
+    background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--border); padding: 16px;
+    transition: all 0.2s;
+  }
+  .screen-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .screen-card.admin-c:hover { border-color: rgba(139,92,246,0.6); }
+  .screen-card.doctor-c:hover { border-color: rgba(16,185,129,0.6); }
+  .screen-card.reception-c:hover { border-color: rgba(245,158,11,0.6); }
+
+  .screen-name {
+    font-size: 0.88rem; font-weight: 700; margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .screen-desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+
+  .screen-components { display: flex; flex-direction: column; gap: 4px; }
+  .screen-comp {
+    font-size: 0.72rem; padding: 4px 8px; border-radius: 5px;
+    background: var(--surface2); color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .comp-icon { font-size: 10px; opacity: 0.7; }
+
+  .screen-tech { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* ========== LEGEND ========== */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    padding: 16px; background: var(--surface2);
+    border-radius: 10px; margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ========== DATA FLOW ========== */
+  .data-flow-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .data-flow-table th {
+    text-align: left; padding: 10px 14px;
+    background: var(--surface2); color: var(--muted);
+    font-weight: 700; font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.08em; border-bottom: 1px solid var(--border);
+  }
+  .data-flow-table td {
+    padding: 10px 14px; border-bottom: 1px solid rgba(30,58,95,0.5);
+    vertical-align: top;
+  }
+  .data-flow-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 0.65rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    margin: 1px;
+  }
+  .pill-blue { background: rgba(14,165,233,0.15); color: var(--accent); }
+  .pill-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .pill-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .pill-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .pill-purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+
+  /* ========== WIREFRAMES ========== */
+  .wireframe-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .wireframe {
+    background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--border); overflow: hidden;
+  }
+
+  .wf-titlebar {
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .wf-dots { display: flex; gap: 5px; }
+  .wf-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .wf-name {
+    font-size: 0.72rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+
+  .wf-body { padding: 14px; }
+  .wf-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+  .wf-elem {
+    border-radius: 5px; border: 1px solid var(--border);
+    background: var(--surface2); font-size: 0.68rem;
+    color: var(--muted); display: flex; align-items: center;
+    justify-content: center; padding: 4px 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .wf-input { flex: 1; height: 28px; }
+  .wf-btn { padding: 4px 12px; background: rgba(14,165,233,0.15); color: var(--accent); border-color: var(--accent); }
+  .wf-btn-green { background: rgba(16,185,129,0.15); color: var(--green); border-color: var(--green); }
+  .wf-btn-red { background: rgba(239,68,68,0.15); color: var(--red); border-color: var(--red); }
+  .wf-btn-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); border-color: var(--yellow); }
+
+  .wf-table { width: 100%; border-collapse: collapse; }
+  .wf-table th, .wf-table td {
+    padding: 5px 8px; border: 1px solid var(--border);
+    font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  }
+  .wf-table th { background: var(--surface2); color: var(--text); }
+
+  .wf-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 2px; font-weight: 600; }
+  .wf-form-group { margin-bottom: 8px; }
+  .wf-badge { padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 700; }
+  .wf-status-wait { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .wf-status-done { background: rgba(16,185,129,0.15); color: var(--green); }
+  .wf-status-cancel { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  .wf-sidebar-item {
+    padding: 7px 10px; border-radius: 6px; font-size: 0.7rem;
+    color: var(--muted); cursor: pointer; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .wf-sidebar-item.active { background: rgba(14,165,233,0.15); color: var(--accent); }
+
+  .wf-stat { text-align: center; padding: 10px; background: var(--surface2); border-radius: 8px; flex: 1; }
+  .wf-stat-num { font-size: 1.2rem; font-weight: 800; }
+  .wf-stat-lbl { font-size: 0.6rem; color: var(--muted); }
+
+  .wf-area { min-height: 60px; border: 1px dashed var(--border); border-radius: 6px; padding: 8px; font-size: 0.65rem; color: var(--muted); font-style: italic; }
+  .wf-img { height: 50px; background: linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.05)); border: 1px dashed var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--accent); flex: 1; }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 768px) {
+    .flow-grid { grid-template-columns: 1fr 1fr; }
+    .content { padding: 20px 16px; }
+    .nav { padding: 12px 16px 0; overflow-x: auto; }
+    .header { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🏥</div>
+  <div>
+    <h1>Phân Tích Hệ Thống – Phòng Khám Da Liễu</h1>
+    <p>QL_PHONGKHAMDALIEU · SQL Server · C# WinForms · 3-Tier Architecture</p>
+  </div>
+  <div class="badge-row">
+    <span class="badge badge-blue">17 Bảng</span>
+    <span class="badge badge-green">3 Stored Procs</span>
+    <span class="badge badge-purple">3 Vai trò</span>
+    <span class="badge" style="background:rgba(239,68,68,0.1);border-color:#ef4444;color:#ef4444;">v2 – Cập nhật</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('flow')">📊 Luồng Hoạt Động</button>
+  <button class="nav-btn" onclick="showTab('screens')">🖥️ Sơ Đồ Màn Hình</button>
+  <button class="nav-btn" onclick="showTab('wireframes')">🎨 Mẫu Giao Diện</button>
+  <button class="nav-btn" onclick="showTab('data')">🗄️ Luồng Dữ Liệu</button>
+</nav>
+
+<!-- ============================================================ -->
+<!-- TAB 1: LUỒNG HOẠT ĐỘNG                                       -->
+<!-- ============================================================ -->
+<div class="content">
+<div id="tab-flow" class="tab-panel active">
+  <div class="section-title">Luồng Hoạt Động Tổng Thể Của Hệ Thống</div>
+  <p class="section-desc">Admin tạo tài khoản cho nhân viên → Nhân viên đăng nhập → Phân quyền theo vai trò → Thực hiện nghiệp vụ → Kết thúc quy trình.</p>
+
+  <div class="main-flow">
+
+    <!-- BƯỚC 0: ADMIN TẠO TÀI KHOẢN -->
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;">0</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content" style="border-color:rgba(139,92,246,0.35);background:rgba(139,92,246,0.04);">
+        <div class="step-title">🛡️ <span style="color:var(--purple)">ADMIN – TẠO TÀI KHOẢN NHÂN VIÊN</span> — <code style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">frmQuanLyNhanVien / frmTaoTaiKhoan</code></div>
+        <div class="step-desc">
+          <b>Bước khởi đầu bắt buộc.</b> Chỉ Admin mới có quyền tạo tài khoản đăng nhập cho nhân viên mới (bác sĩ, lễ tân). Nhân viên <b>không thể tự đăng ký</b> — mọi tài khoản đều được Admin cấp và phân quyền. Luồng này đảm bảo kiểm soát tập trung về bảo mật nhân sự.
+        </div>
+        <div class="step-detail">
+          <div class="detail-card" style="border-color:rgba(139,92,246,0.3)">
+            <div class="detail-card-title" style="color:var(--purple)">Điều kiện tiên quyết</div>
+            <ul>
+              <li>Chỉ Admin (MaVaiTro = 1) mới truy cập được form này</li>
+              <li>Admin phải đăng nhập trước bằng tài khoản gốc (seed data)</li>
+              <li>Tài khoản Admin gốc được tạo thủ công qua script SQL khi triển khai</li>
+            </ul>
+          </div>
+          <div class="detail-card" style="border-color:rgba(139,92,246,0.3)">
+            <div class="detail-card-title" style="color:var(--purple)">Thông tin tạo tài khoản</div>
+            <ul>
+              <li><b>HoTen, SoDienThoai, Email</b> — Thông tin cá nhân</li>
+              <li><b>TenDangNhap</b> — Phải UNIQUE, kiểm tra trùng ngay khi nhập</li>
+              <li><b>MatKhau</b> — Admin đặt mật khẩu tạm, nhân viên đổi lần đầu đăng nhập</li>
+              <li><b>MaVaiTro</b> — Admin chọn: Bác sĩ (2) hoặc Lễ tân (3)</li>
+            </ul>
+          </div>
+          <div class="detail-card" style="border-color:rgba(139,92,246,0.3)">
+            <div class="detail-card-title" style="color:var(--purple)">Logic & Ràng buộc DB</div>
+            <ul>
+              <li><code>UNIQUE TenDangNhap</code> — DB tự chặn trùng tên đăng nhập</li>
+              <li><code>UNIQUE SoDienThoai</code> — Mỗi nhân viên 1 SĐT riêng</li>
+              <li>MatKhau lưu dạng <code>hash (SHA256/BCrypt)</code>, không lưu plaintext</li>
+              <li>INSERT vào bảng <code>NhanVien</code> với FK → <code>VaiTro</code></li>
+              <li>Admin có thể <b>khóa</b> (vô hiệu hóa) hoặc <b>đặt lại mật khẩu</b> bất kỳ lúc nào</li>
+            </ul>
+          </div>
+          <div class="detail-card" style="border-color:rgba(139,92,246,0.3)">
+            <div class="detail-card-title" style="color:var(--purple)">Patch SQL cần thêm</div>
+            <ul>
+              <li>Thêm cột <code>TrangThaiTK BIT DEFAULT 1</code> vào NhanVien (1=Hoạt động, 0=Khóa)</li>
+              <li>Thêm cột <code>DoiMatKhau BIT DEFAULT 1</code> — Bắt đổi MK lần đầu</li>
+              <li>Kiểm tra <code>TrangThaiTK = 1</code> trong logic đăng nhập</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);color:#fff;">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">🔐 <span style="color:var(--accent)">ĐĂNG NHẬP HỆ THỐNG</span> — <code style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">frmDangNhap</code></div>
+        <div class="step-desc">Nhân viên nhập <b>TenDangNhap + MatKhau</b> do Admin đã cấp. Hệ thống truy vấn bảng <code>NhanVien</code> → JOIN với <code>VaiTro</code> → kiểm tra <code>TrangThaiTK = 1</code> (không bị khóa). Nếu là lần đầu đăng nhập (<code>DoiMatKhau = 1</code>) → bắt buộc đổi mật khẩu trước khi vào hệ thống. Dựa vào <code>MaVaiTro</code>, chuyển hướng sang Dashboard tương ứng.</div>
+        <div class="step-detail">
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--accent)">Logic xác thực đầy đủ</div>
+            <ul>
+              <li>SELECT NhanVien WHERE TenDangNhap = @user</li>
+              <li>Kiểm tra <code>TrangThaiTK = 1</code> (chưa bị khóa)</li>
+              <li>So sánh MatKhau (hash BCrypt)</li>
+              <li>Nếu <code>DoiMatKhau = 1</code> → frmDoiMatKhau</li>
+              <li>Lấy <code>MaVaiTro</code> → phân quyền màn hình</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--accent)">3 Nhánh phân quyền</div>
+            <ul>
+              <li><b style="color:var(--purple)">1 - Admin</b>: Toàn quyền hệ thống</li>
+              <li><b style="color:var(--green)">2 - Bác sĩ</b>: Khám, kê đơn, hồ sơ</li>
+              <li><b style="color:var(--yellow)">3 - Lễ tân</b>: Tiếp nhận, lịch hẹn</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--red)">Bảo mật</div>
+            <ul>
+              <li>Sai mật khẩu → đếm số lần sai</li>
+              <li>Sai ≥ 5 lần → SET TrangThaiTK = 0 (khóa)</li>
+              <li>Chỉ Admin mới mở khóa lại được</li>
+              <li>Lưu phiên đăng nhập (Singleton)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BƯỚC 2: LỄ TÂN – TIẾP NHẬN -->
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">👩‍💼 <span style="color:var(--yellow)">LỄ TÂN – TIẾP NHẬN BỆNH NHÂN</span></div>
+        <div class="step-desc">Lễ tân kiểm tra bệnh nhân trong hệ thống bằng SĐT. Nếu chưa có → tạo mới bảng <code>BenhNhan</code>. Sau đó gọi SP để tạo đồng thời Phiếu Khám + Dịch vụ cơ bản + Hóa đơn chờ thanh toán trong 1 Transaction. Phiếu khám được tạo với <code>TrangThai = 0</code> (Chờ khám).</div>
+        <div class="step-detail">
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--yellow)">Form: frmTiepNhanBenhNhan</div>
+            <ul>
+              <li>Tìm kiếm BN theo SĐT</li>
+              <li>Nếu mới: Điền thông tin BN</li>
+              <li>Chọn Bác sĩ phụ trách</li>
+              <li>Nhập triệu chứng ban đầu</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--yellow)">SP_TiepNhanBenhNhan_AnToan</div>
+            <ul>
+              <li><code>BEGIN TRAN</code> — Gói 3 bước</li>
+              <li>B1: INSERT <code>PhieuKham</code> (TrangThai=0)</li>
+              <li>B2: INSERT <code>ChiTietDichVu</code> (Khám cơ bản, lấy giá động từ DichVu)</li>
+              <li>B3: INSERT <code>HoaDon</code> (TrangThai=0, chờ thanh toán)</li>
+              <li><code>ROLLBACK</code> nếu có lỗi bất kỳ</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--yellow)">Form: frmDatLichHen</div>
+            <ul>
+              <li>Chọn BN + Bác sĩ + Ngày giờ</li>
+              <li>Gọi <code>SP_DatLichHenMoi</code></li>
+              <li>Chặn trùng ±29 phút cùng bác sĩ</li>
+              <li>Lịch hẹn liên kết PhieuKham qua MaLichHen</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BƯỚC 2: BÁC SĨ KHÁM BỆNH -->
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">👨‍⚕️ <span style="color:var(--green)">BÁC SĨ – KHÁM VÀ KÊ ĐƠN</span></div>
+        <div class="step-desc">Bác sĩ xem danh sách bệnh nhân chờ khám (tự động refresh theo Timer). Mở phiếu khám → nhập Triệu chứng, Chẩn đoán → thêm Dịch vụ thẩm mỹ → Kê đơn thuốc FIFO → Upload hình ảnh bệnh lý → Xác nhận xong.</div>
+        <div class="step-detail">
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--green)">Form: frmDanhSachChoKham</div>
+            <ul>
+              <li>DataGridView danh sách BN chờ</li>
+              <li>Timer auto-refresh mỗi 30 giây</li>
+              <li>Lọc theo ngày / tên / trạng thái</li>
+              <li>Double-click → Mở frmKhamBenh</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--green)">Form: frmKhamBenh</div>
+            <ul>
+              <li>TextBox: Triệu chứng, Chẩn đoán</li>
+              <li>DatePicker: Ngày tái khám</li>
+              <li>DataGridView: Thêm Dịch vụ</li>
+              <li>PictureBox: So sánh ảnh bệnh lý</li>
+              <li>UPDATE <code>PhieuKham</code> (Temporal Table ghi lịch sử)</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--green)">Form: frmKeDonThuoc — FIFO</div>
+            <ul>
+              <li>Tìm kiếm thuốc realtime</li>
+              <li>Nhập số lượng, liều dùng</li>
+              <li>Gọi <code>SP_KeDonThuoc_FIFO</code></li>
+              <li>Kiểm tra tồn kho trước khi kê</li>
+              <li>Xuất kho: ưu tiên lô cận Date trước</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--green)">Quản lý hình ảnh</div>
+            <ul>
+              <li>Upload: Chọn file ảnh</li>
+              <li>Đặt tên: <code>BN{MaBN}_{Date}.jpg</code></li>
+              <li>Nén ảnh trước khi lưu</li>
+              <li>Lưu đường dẫn vào DB</li>
+              <li>PictureBox: Trước / Sau điều trị</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BƯỚC 3: THANH TOÁN -->
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#ec4899,#db2777);color:#fff;">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">💰 <span style="color:var(--pink)">LỄ TÂN – THANH TOÁN & PHÁT THUỐC</span></div>
+        <div class="step-desc">Lễ tân nhận bệnh nhân từ phòng khám → Xem hóa đơn tổng hợp (Dịch vụ + Thuốc) → Áp dụng giảm giá (nếu có) → Thu tiền → In hóa đơn → UPDATE <code>HoaDon.TrangThai = 1</code>. Mọi thay đổi hóa đơn được ghi vào <code>HoaDon_LichSu</code>.</div>
+        <div class="step-detail">
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--pink)">Form: frmThanhToan</div>
+            <ul>
+              <li>Xem chi tiết: Dịch vụ + Thuốc</li>
+              <li>Tính TongTien tự động</li>
+              <li>Nhập GiamGia (nếu có)</li>
+              <li>Chọn PTTT: Tiền mặt / CK</li>
+              <li>Nhập TienKhachTra → Tính tiền thừa</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--pink)">Xác nhận thanh toán</div>
+            <ul>
+              <li>UPDATE <code>HoaDon</code> TrangThai=1</li>
+              <li>UPDATE <code>LichHen</code> TrangThai=2</li>
+              <li>Temporal Table ghi <code>HoaDon_LichSu</code></li>
+              <li>In phiếu thu / hóa đơn PDF</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--pink)">Bảo mật tài chính</div>
+            <ul>
+              <li><code>HoaDon_LichSu</code> ghi mọi thay đổi</li>
+              <li>Admin có thể truy xuất lịch sử gian lận</li>
+              <li>Xem: ThoiGianBatDau / ThoiGianKetThuc</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BƯỚC 4: ADMIN -->
+    <div class="flow-step">
+      <div class="step-connector">
+        <div class="step-num" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">🛡️ <span style="color:var(--purple)">ADMIN – QUẢN TRỊ & BÁO CÁO</span></div>
+        <div class="step-desc">Admin toàn quyền: Quản lý nhân viên, phân ca, nhập kho, quản lý chi phí hoạt động, xem báo cáo doanh thu, và kiểm tra lịch sử audit trail khi nghi ngờ gian lận.</div>
+        <div class="step-detail">
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--purple)">Quản lý nhân sự & ca</div>
+            <ul>
+              <li>CRUD Nhân viên + Vai trò</li>
+              <li>Xếp lịch <code>PhanCongCa</code></li>
+              <li>Điểm danh ca làm việc</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--purple)">Quản lý kho hàng</div>
+            <ul>
+              <li>Tạo <code>PhieuNhapKho</code></li>
+              <li>Trigger tự CỘNG <code>SoLuongTon</code></li>
+              <li>Xem tồn kho theo lô FIFO</li>
+              <li>Cảnh báo dưới định mức tối thiểu</li>
+            </ul>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title" style="color:var(--purple)">Báo cáo & Audit</div>
+            <ul>
+              <li>View <code>VW_BaoCaoDoanhThu</code></li>
+              <li>Biểu đồ doanh thu theo kỳ</li>
+              <li>Chi phí hoạt động vs Doanh thu</li>
+              <li>Lịch sử <code>PhieuKham_LichSu</code></li>
+              <li>Lịch sử <code>HoaDon_LichSu</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEGEND -->
+  <div class="section-title">Bản Đồ Luồng Theo 4 Cột Vai Trò</div>
+  <p class="section-desc">Tổng quan tất cả màn hình và chức năng theo từng vai trò trong hệ thống.</p>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span> Đăng ký (Admin tạo TK)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span> Đăng nhập / Đổi MK</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span> Admin</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span> Bác sĩ</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--yellow)"></span> Lễ tân</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Dùng chung</span>
+    <span class="legend-item"><span class="flow-tag tag-sp" style="display:inline">SP</span> Stored Procedure</span>
+    <span class="legend-item"><span class="flow-tag tag-trigger" style="display:inline">TRG</span> Trigger</span>
+    <span class="legend-item"><span class="flow-tag tag-view" style="display:inline">VIEW</span> View</span>
+    <span class="legend-item"><span class="flow-tag tag-tx" style="display:inline">TRAN</span> Transaction</span>
+    <span class="legend-item" style="color:var(--purple);font-size:0.75rem">⭐ = Màn hình mới thêm</span>
+  </div>
+
+  <div class="flow-grid">
+
+    <!-- CỘT ĐĂNG NHẬP -->
+    <div class="flow-col col-login">
+      <div class="flow-col-title">🔐 ĐĂNG NHẬP / ĐỔI MK</div>
+      <div class="flow-box" style="border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.08);text-align:center;">
+        <div class="flow-box-title" style="color:var(--purple)">⚙️ Tiền điều kiện</div>
+        <div class="flow-box-sub">Admin tạo TK trước</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">INSERT NhanVien</span></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:0.75rem;padding:4px;">↓</div>
+      <div class="flow-box start">
+        <div class="flow-box-title" style="color:var(--accent)">frmDangNhap</div>
+        <div class="flow-box-sub">Login Screen</div>
+        <div class="flow-box-tags">
+          <span class="flow-tag tag-crud">SELECT NhanVien + VaiTro</span>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:0.75rem;padding:4px;">↓ DoiMatKhau = 1?</div>
+      <div class="flow-box" style="border-color:rgba(239,68,68,0.4);">
+        <div class="flow-box-title" style="color:var(--red)">frmDoiMatKhau</div>
+        <div class="flow-box-sub">Đổi MK lần đầu (bắt buộc)</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">UPDATE MatKhau, DoiMatKhau=0</span></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:0.75rem;padding:8px;">↓ Phân quyền theo MaVaiTro</div>
+    </div>
+
+    <!-- CỘT ADMIN -->
+    <div class="flow-col col-admin">
+      <div class="flow-col-title">🛡️ ADMIN</div>
+
+      <div class="flow-box admin-box" style="border-color:rgba(139,92,246,0.7);background:rgba(139,92,246,0.12);">
+        <div class="flow-box-title" style="color:var(--purple)">⭐ frmTaoTaiKhoan</div>
+        <div class="flow-box-sub">Tạo TK cho nhân viên mới</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">INSERT NhanVien + VaiTro</span></div>
+      </div>
+
+      <div class="flow-box admin-box" style="border-color:rgba(139,92,246,0.7);background:rgba(139,92,246,0.12);">
+        <div class="flow-box-title" style="color:var(--purple)">⭐ frmQuanLyTaiKhoan</div>
+        <div class="flow-box-sub">Khóa / Mở khóa / Reset MK</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">UPDATE TrangThaiTK, DoiMatKhau</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmDashboard_Admin</div>
+        <div class="flow-box-sub">Tổng quan hệ thống</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-view">VIEW</span><span class="flow-tag tag-crud">Thống kê</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmQuanLyNhanVien</div>
+        <div class="flow-box-sub">Xem & Sửa hồ sơ NV</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">UPDATE NhanVien</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmPhanCongCa</div>
+        <div class="flow-box-sub">Xếp lịch & Điểm danh</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">PhanCongCa · CaLamViec</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmNhapKho</div>
+        <div class="flow-box-sub">Phiếu Nhập Kho</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-trigger">TRG_NhapKho_CapNhatTon</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmQuanLyNhaCungCap</div>
+        <div class="flow-box-sub">CRUD NhaCungCap</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">CRUD</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmChiPhiHoatDong</div>
+        <div class="flow-box-sub">Nhập chi phí kế toán</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">ChiPhiHoatDong</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmBaoCaoDoanhThu</div>
+        <div class="flow-box-sub">Thống kê doanh thu</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-view">VW_BaoCaoDoanhThu</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmAuditTrail</div>
+        <div class="flow-box-sub">Lịch sử chỉnh sửa gian lận</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-trigger">PhieuKham_LichSu</span><span class="flow-tag tag-trigger">HoaDon_LichSu</span></div>
+      </div>
+
+      <div class="flow-box admin-box">
+        <div class="flow-box-title">frmQuanLyDichVu</div>
+        <div class="flow-box-sub">CRUD DichVu</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">CRUD</span></div>
+      </div>
+    </div>
+
+    <!-- CỘT BÁC SĨ -->
+    <div class="flow-col col-doctor">
+      <div class="flow-col-title">👨‍⚕️ BÁC SĨ</div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmDashboard_BacSi</div>
+        <div class="flow-box-sub">Tổng quan ngày làm việc</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">Lịch hẹn hôm nay</span></div>
+      </div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmDanhSachChoKham</div>
+        <div class="flow-box-sub">Hàng đợi bệnh nhân</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">Timer Auto-Refresh</span></div>
+      </div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmKhamBenh</div>
+        <div class="flow-box-sub">Khám + Dịch vụ + Ảnh</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">UPDATE PhieuKham</span><span class="flow-tag tag-trigger">Temporal Table</span></div>
+      </div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmKeDonThuoc</div>
+        <div class="flow-box-sub">Kê đơn thuốc FIFO</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-sp">SP_KeDonThuoc_FIFO</span><span class="flow-tag tag-tx">TRANSACTION</span></div>
+      </div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmHoSoBenhAn</div>
+        <div class="flow-box-sub">Lịch sử khám của BN</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-view">VW_HoSoBenhAn</span></div>
+      </div>
+
+      <div class="flow-box doctor-box">
+        <div class="flow-box-title">frmXemHinhAnhBenh</div>
+        <div class="flow-box-sub">So sánh ảnh trước/sau</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">Path từ DB · File System</span></div>
+      </div>
+    </div>
+
+    <!-- CỘT LỄ TÂN -->
+    <div class="flow-col col-reception">
+      <div class="flow-col-title">👩‍💼 LỄ TÂN</div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmDashboard_LeTan</div>
+        <div class="flow-box-sub">Quầy lễ tân tổng quan</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">Lịch hẹn + BN chờ</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmQuanLyBenhNhan</div>
+        <div class="flow-box-sub">Tìm kiếm & Quản lý BN</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">CRUD BenhNhan</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmTiepNhanBenhNhan</div>
+        <div class="flow-box-sub">Đăng ký khám mới</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-sp">SP_TiepNhanBenhNhan_AnToan</span><span class="flow-tag tag-tx">TRANSACTION</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmDatLichHen</div>
+        <div class="flow-box-sub">Đặt lịch hẹn</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-sp">SP_DatLichHenMoi</span><span class="flow-tag tag-crud">Chống trùng ±29p</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmDanhSachLichHen</div>
+        <div class="flow-box-sub">Xem & quản lý lịch hẹn</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">LichHen · Filter</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmThanhToan</div>
+        <div class="flow-box-sub">Thu tiền & Phát thuốc</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">UPDATE HoaDon</span><span class="flow-tag tag-trigger">HoaDon_LichSu</span></div>
+      </div>
+
+      <div class="flow-box reception-box">
+        <div class="flow-box-title">frmInHoaDon</div>
+        <div class="flow-box-sub">In phiếu thu / hoá đơn</div>
+        <div class="flow-box-tags"><span class="flow-tag tag-crud">PrintDocument</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 2: SƠ ĐỒ MÀN HÌNH                                       -->
+<!-- ============================================================ -->
+<div id="tab-screens" class="tab-panel">
+  <div class="section-title">Sơ Đồ Toàn Bộ Màn Hình (Forms) Của Hệ Thống</div>
+  <p class="section-desc">Chi tiết từng form: mục đích, thành phần UI, bảng dữ liệu liên quan và kỹ thuật xử lý.</p>
+
+  <!-- ADMIN -->
+  <div class="role-section">
+    <div class="role-header admin-h">
+      <div class="role-icon" style="background:rgba(139,92,246,0.2)">🛡️</div>
+      <div>
+        <h3 style="color:var(--purple)">Quản Trị Viên (Admin) — MaVaiTro = 1</h3>
+        <p>Toàn quyền hệ thống · Quản lý nhân sự, kho hàng, tài chính, báo cáo</p>
+      </div>
+      <span class="role-count" style="background:rgba(139,92,246,0.15);color:var(--purple)">11 Màn hình</span>
+    </div>
+    <div class="screen-grid">
+      <div class="screen-card admin-c" style="border-color:rgba(139,92,246,0.6);background:rgba(139,92,246,0.05);">
+        <div class="screen-name" style="color:var(--purple)">⭐ frmTaoTaiKhoan</div>
+        <div class="screen-desc">Admin tạo tài khoản mới cho nhân viên — bước khởi đầu bắt buộc</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📝</span> TextBox: HoTen, SoDienThoai, Email</div>
+          <div class="screen-comp"><span class="comp-icon">👤</span> TextBox: TenDangNhap + Label kiểm tra trùng realtime</div>
+          <div class="screen-comp"><span class="comp-icon">🔑</span> TextBox: MatKhau tạm (Admin đặt)</div>
+          <div class="screen-comp"><span class="comp-icon">🎭</span> ComboBox: Chọn Vai Trò (Bác sĩ / Lễ tân)</div>
+          <div class="screen-comp"><span class="comp-icon">✅</span> Button "Tạo tài khoản" → INSERT NhanVien</div>
+          <div class="screen-comp"><span class="comp-icon">⚠️</span> Thông báo lỗi nếu TenDangNhap hoặc SĐT đã tồn tại</div>
+        </div>
+        <div class="screen-tech">
+          <span class="pill pill-purple">NhanVien</span>
+          <span class="pill pill-purple">VaiTro</span>
+          <span class="pill pill-red">UNIQUE TenDangNhap</span>
+          <span class="pill pill-blue">DoiMatKhau = 1 (mặc định)</span>
+        </div>
+      </div>
+
+      <div class="screen-card admin-c" style="border-color:rgba(139,92,246,0.6);background:rgba(139,92,246,0.05);">
+        <div class="screen-name" style="color:var(--purple)">⭐ frmQuanLyTaiKhoan</div>
+        <div class="screen-desc">Admin quản lý toàn bộ trạng thái tài khoản nhân viên</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView: Danh sách NV + TrangThaiTK</div>
+          <div class="screen-comp"><span class="comp-icon">🔒</span> Button "Khóa TK" → SET TrangThaiTK = 0</div>
+          <div class="screen-comp"><span class="comp-icon">🔓</span> Button "Mở khóa" → SET TrangThaiTK = 1</div>
+          <div class="screen-comp"><span class="comp-icon">🔑</span> Button "Reset MK" → SET MatKhau = hash(mặc định), DoiMatKhau = 1</div>
+          <div class="screen-comp"><span class="comp-icon">🎭</span> Thay đổi Vai trò nhân viên</div>
+        </div>
+        <div class="screen-tech">
+          <span class="pill pill-purple">NhanVien</span>
+          <span class="pill pill-blue">TrangThaiTK</span>
+          <span class="pill pill-blue">DoiMatKhau</span>
+        </div>
+      </div>
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmDashboard_Admin</div>
+        <div class="screen-desc">Màn hình chính - tổng quan hệ thống, thanh điều hướng</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📊</span> Chart doanh thu tuần/tháng</div>
+          <div class="screen-comp"><span class="comp-icon">🔢</span> Thẻ thống kê: BN hôm nay, doanh thu, tồn kho thấp</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> Menu/Tab điều hướng các chức năng</div>
+          <div class="screen-comp"><span class="comp-icon">🔔</span> Cảnh báo tồn kho dưới định mức</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">VW_BaoCaoDoanhThu</span><span class="pill pill-blue">Thuoc.SoLuongTon</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmQuanLyNhanVien</div>
+        <div class="screen-desc">CRUD đầy đủ danh sách nhân viên, gán vai trò</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> TextBox tìm kiếm realtime (Text_Changed)</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView danh sách NV</div>
+          <div class="screen-comp"><span class="comp-icon">✏️</span> Form nhập: HoTen, SDT, Email, VaiTro, MatKhau</div>
+          <div class="screen-comp"><span class="comp-icon">🔒</span> Reset mật khẩu</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">NhanVien</span><span class="pill pill-purple">VaiTro</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmPhanCongCa</div>
+        <div class="screen-desc">Xếp lịch ca làm việc, điểm danh nhân viên</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📅</span> DatePicker chọn ngày</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> Bảng phân công: NV × Ca</div>
+          <div class="screen-comp"><span class="comp-icon">✅</span> Checkbox điểm danh (Có mặt / Nghỉ)</div>
+          <div class="screen-comp"><span class="comp-icon">➕</span> Thêm phân công mới</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">PhanCongCa</span><span class="pill pill-purple">CaLamViec</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmNhapKho</div>
+        <div class="screen-desc">Tạo phiếu nhập kho, trigger tự động cộng tồn</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🏪</span> ComboBox chọn Nhà cung cấp</div>
+          <div class="screen-comp"><span class="comp-icon">📦</span> DataGridView chi tiết lô hàng</div>
+          <div class="screen-comp"><span class="comp-icon">📅</span> DatePicker Hạn sử dụng từng lô</div>
+          <div class="screen-comp"><span class="comp-icon">💰</span> Tự tính TongGiaTri</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-red">TRG_NhapKho_CapNhatTon</span><span class="pill pill-purple">PhieuNhapKho</span><span class="pill pill-purple">ChiTietNhapKho</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmQuanLyKho</div>
+        <div class="screen-desc">Xem tồn kho, cảnh báo, tra lô hàng FIFO</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📊</span> DataGridView tồn kho tổng hợp</div>
+          <div class="screen-comp"><span class="comp-icon">⚠️</span> Highlight đỏ thuốc sắp hết</div>
+          <div class="screen-comp"><span class="comp-icon">🗂️</span> Tab chi tiết từng lô (HanSuDung, SL còn)</div>
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Filter theo tên thuốc</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">Thuoc</span><span class="pill pill-purple">ChiTietNhapKho</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmChiPhiHoatDong</div>
+        <div class="screen-desc">Nhập và theo dõi các khoản chi phí vận hành</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📝</span> Form nhập: LoaiChiPhi, SoTien, NgayChi, GhiChu</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> Bảng lịch sử chi phí theo tháng</div>
+          <div class="screen-comp"><span class="comp-icon">📊</span> Tổng chi phí vs Doanh thu</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">ChiPhiHoatDong</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmBaoCaoDoanhThu</div>
+        <div class="screen-desc">Báo cáo tài chính tổng hợp, biểu đồ thống kê</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📅</span> DatePicker kỳ báo cáo (từ ngày - đến ngày)</div>
+          <div class="screen-comp"><span class="comp-icon">📊</span> Chart doanh thu theo ngày/tháng</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView chi tiết hóa đơn</div>
+          <div class="screen-comp"><span class="comp-icon">🖨️</span> Xuất Excel / In báo cáo</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">VW_BaoCaoDoanhThu</span><span class="pill pill-purple">ChiPhiHoatDong</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmAuditTrail</div>
+        <div class="screen-desc">Truy xuất lịch sử chỉnh sửa hồ sơ / hóa đơn (chống gian lận)</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Tìm theo MaPhieuKham hoặc MaHoaDon</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> So sánh: Giá trị cũ ↔ Giá trị mới</div>
+          <div class="screen-comp"><span class="comp-icon">⏱️</span> Hiển thị ThoiGianBatDau / ThoiGianKetThuc</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-red">PhieuKham_LichSu</span><span class="pill pill-red">HoaDon_LichSu</span><span class="pill pill-purple">Temporal Tables</span></div>
+      </div>
+
+      <div class="screen-card admin-c">
+        <div class="screen-name" style="color:var(--purple)">frmQuanLyDichVu</div>
+        <div class="screen-desc">CRUD danh sách dịch vụ & mỹ phẩm, quản lý giá</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView DichVu + Thuoc</div>
+          <div class="screen-comp"><span class="comp-icon">✏️</span> Inline edit tên, đơn giá</div>
+          <div class="screen-comp"><span class="comp-icon">➕</span> Thêm / Sửa / Xóa</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-purple">DichVu</span><span class="pill pill-purple">Thuoc</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÙNG CHUNG -->
+  <div class="role-section">
+    <div class="role-header" style="background:linear-gradient(135deg,rgba(14,165,233,0.1),transparent);border:1px solid rgba(14,165,233,0.3);">
+      <div class="role-icon" style="background:rgba(14,165,233,0.2)">🔄</div>
+      <div>
+        <h3 style="color:var(--accent)">Dùng Chung — Tất cả vai trò</h3>
+        <p>Form xuất hiện với mọi nhân viên sau khi đăng nhập lần đầu</p>
+      </div>
+      <span class="role-count" style="background:rgba(14,165,233,0.15);color:var(--accent)">2 Màn hình</span>
+    </div>
+    <div class="screen-grid">
+      <div class="screen-card" style="border-color:rgba(14,165,233,0.4);">
+        <div class="screen-name" style="color:var(--accent)">frmDoiMatKhau</div>
+        <div class="screen-desc">Bắt buộc đổi mật khẩu khi đăng nhập lần đầu (DoiMatKhau = 1)</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔑</span> PasswordBox: Mật khẩu mới</div>
+          <div class="screen-comp"><span class="comp-icon">🔑</span> PasswordBox: Xác nhận mật khẩu</div>
+          <div class="screen-comp"><span class="comp-icon">✅</span> Validate: Độ dài ≥ 8, có chữ hoa + số</div>
+          <div class="screen-comp"><span class="comp-icon">💾</span> UPDATE NhanVien SET MatKhau = hash(@mk), DoiMatKhau = 0</div>
+          <div class="screen-comp"><span class="comp-icon">🚫</span> Không thể bỏ qua — không vào hệ thống được nếu chưa đổi</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-blue">NhanVien.MatKhau</span><span class="pill pill-blue">NhanVien.DoiMatKhau</span></div>
+      </div>
+      <div class="screen-card" style="border-color:rgba(14,165,233,0.4);">
+        <div class="screen-name" style="color:var(--accent)">frmDoiMatKhau_TuNguyen</div>
+        <div class="screen-desc">Nhân viên chủ động đổi mật khẩu từ menu cá nhân bất kỳ lúc nào</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔑</span> PasswordBox: Mật khẩu hiện tại (xác minh)</div>
+          <div class="screen-comp"><span class="comp-icon">🔑</span> PasswordBox: Mật khẩu mới</div>
+          <div class="screen-comp"><span class="comp-icon">🔑</span> PasswordBox: Xác nhận mật khẩu mới</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-blue">NhanVien.MatKhau</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BÁC SĨ -->
+  <div class="role-section">
+    <div class="role-header doctor-h">
+      <div class="role-icon" style="background:rgba(16,185,129,0.2)">👨‍⚕️</div>
+      <div>
+        <h3 style="color:var(--green)">Bác Sĩ Da Liễu — MaVaiTro = 2</h3>
+        <p>Khám bệnh · Kê đơn thuốc FIFO · Quản lý hình ảnh bệnh lý · Xem hồ sơ</p>
+      </div>
+      <span class="role-count" style="background:rgba(16,185,129,0.15);color:var(--green)">6 Màn hình</span>
+    </div>
+    <div class="screen-grid">
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmDashboard_BacSi</div>
+        <div class="screen-desc">Trang chủ bác sĩ: lịch hẹn hôm nay, số BN chờ</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📋</span> Danh sách lịch hẹn hôm nay</div>
+          <div class="screen-comp"><span class="comp-icon">🔢</span> Số BN: Đang chờ / Đã khám / Tổng</div>
+          <div class="screen-comp"><span class="comp-icon">📅</span> Lịch làm việc tuần</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">LichHen</span><span class="pill pill-green">PhieuKham</span></div>
+      </div>
+
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmDanhSachChoKham</div>
+        <div class="screen-desc">Hàng đợi bệnh nhân chờ khám, tự động refresh</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">⏱️</span> System.Windows.Forms.Timer (30s refresh)</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView: STT, HoTen, ThoiGian, TrieuChung</div>
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Filter tên BN realtime</div>
+          <div class="screen-comp"><span class="comp-icon">▶️</span> Button "Gọi khám" → frmKhamBenh</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">PhieuKham</span><span class="pill pill-green">BenhNhan</span><span class="pill pill-blue">Timer</span></div>
+      </div>
+
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmKhamBenh</div>
+        <div class="screen-desc">Form khám chính: triệu chứng, chẩn đoán, dịch vụ, hình ảnh</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📄</span> Info BN: HoTen, NgaySinh, TienSuBenhLy</div>
+          <div class="screen-comp"><span class="comp-icon">📝</span> RichTextBox: Triệu chứng, Chẩn đoán</div>
+          <div class="screen-comp"><span class="comp-icon">🔬</span> DataGridView thêm/xóa Dịch vụ</div>
+          <div class="screen-comp"><span class="comp-icon">🖼️</span> 2x PictureBox: Ảnh Trước / Ảnh Sau</div>
+          <div class="screen-comp"><span class="comp-icon">📅</span> DatePicker Ngày tái khám</div>
+          <div class="screen-comp"><span class="comp-icon">💊</span> Button → frmKeDonThuoc</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">PhieuKham</span><span class="pill pill-green">ChiTietDichVu</span><span class="pill pill-red">Temporal Table</span></div>
+      </div>
+
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmKeDonThuoc</div>
+        <div class="screen-desc">Kê đơn thuốc thông minh theo thuật toán FIFO/FEFO</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> AutoComplete tên thuốc (Text_Changed)</div>
+          <div class="screen-comp"><span class="comp-icon">📦</span> Hiển thị tồn kho hiện tại</div>
+          <div class="screen-comp"><span class="comp-icon">🔢</span> NumericUpDown: Số lượng kê</div>
+          <div class="screen-comp"><span class="comp-icon">📝</span> TextBox: Liều dùng hướng dẫn</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView đơn thuốc đã kê</div>
+          <div class="screen-comp"><span class="comp-icon">⚠️</span> Alert đỏ nếu SL vượt tồn kho</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-blue">SP_KeDonThuoc_FIFO</span><span class="pill pill-yellow">TRANSACTION</span><span class="pill pill-green">ChiTietDonThuoc</span></div>
+      </div>
+
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmHoSoBenhAn</div>
+        <div class="screen-desc">Xem toàn bộ lịch sử khám của một bệnh nhân</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Tìm BN theo tên / SĐT</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> Timeline các lần khám</div>
+          <div class="screen-comp"><span class="comp-icon">🔬</span> Chi tiết từng lần: Triệu chứng, Chẩn đoán, Đơn thuốc</div>
+          <div class="screen-comp"><span class="comp-icon">🖼️</span> Gallery ảnh bệnh lý qua các lần</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">VW_HoSoBenhAn</span><span class="pill pill-green">ChiTietDonThuoc</span></div>
+      </div>
+
+      <div class="screen-card doctor-c">
+        <div class="screen-name" style="color:var(--green)">frmXemHinhAnhBenh</div>
+        <div class="screen-desc">So sánh hình ảnh bệnh lý trước và sau điều trị</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📤</span> OpenFileDialog chọn ảnh mới</div>
+          <div class="screen-comp"><span class="comp-icon">🖼️</span> Side-by-side PictureBox: Trước / Sau</div>
+          <div class="screen-comp"><span class="comp-icon">🗂️</span> Gallery ảnh theo ngày khám</div>
+          <div class="screen-comp"><span class="comp-icon">💾</span> Lưu path ảnh vào DB sau khi nén</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-green">PhieuKham (AnhBenh path)</span><span class="pill pill-blue">System.Drawing</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LỄ TÂN -->
+  <div class="role-section">
+    <div class="role-header reception-h">
+      <div class="role-icon" style="background:rgba(245,158,11,0.2)">👩‍💼</div>
+      <div>
+        <h3 style="color:var(--yellow)">Lễ Tân — MaVaiTro = 3</h3>
+        <p>Tiếp nhận · Đặt lịch hẹn · Thu ngân · In hóa đơn</p>
+      </div>
+      <span class="role-count" style="background:rgba(245,158,11,0.15);color:var(--yellow)">7 Màn hình</span>
+    </div>
+    <div class="screen-grid">
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmDashboard_LeTan</div>
+        <div class="screen-desc">Quầy lễ tân: lịch hẹn hôm nay, BN chờ thanh toán</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📋</span> Danh sách lịch hẹn hôm nay</div>
+          <div class="screen-comp"><span class="comp-icon">💳</span> Danh sách BN chờ thanh toán</div>
+          <div class="screen-comp"><span class="comp-icon">⚡</span> Button nhanh: Tiếp nhận / Đặt lịch</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-yellow">LichHen</span><span class="pill pill-yellow">HoaDon.TrangThai=0</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmQuanLyBenhNhan</div>
+        <div class="screen-desc">Tìm kiếm, xem và chỉnh sửa thông tin bệnh nhân</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Tìm kiếm theo SĐT hoặc HoTen</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView danh sách</div>
+          <div class="screen-comp"><span class="comp-icon">✏️</span> Panel chỉnh sửa thông tin BN</div>
+          <div class="screen-comp"><span class="comp-icon">📖</span> Xem lịch sử lần khám</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-yellow">BenhNhan</span><span class="pill pill-yellow">UNIQUE SoDienThoai</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmTiepNhanBenhNhan</div>
+        <div class="screen-desc">Đăng ký khám mới — Transaction ACID tạo 3 bản ghi</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">🔍</span> Tìm BN theo SĐT trước</div>
+          <div class="screen-comp"><span class="comp-icon">👤</span> Nếu mới: Form nhập thông tin BN đầy đủ</div>
+          <div class="screen-comp"><span class="comp-icon">👨‍⚕️</span> ComboBox chọn Bác sĩ phụ trách</div>
+          <div class="screen-comp"><span class="comp-icon">📝</span> TextBox mô tả triệu chứng ban đầu</div>
+          <div class="screen-comp"><span class="comp-icon">✅</span> Button "Xác nhận tiếp nhận"</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-blue">SP_TiepNhanBenhNhan_AnToan</span><span class="pill pill-yellow">TRANSACTION ACID</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmDatLichHen</div>
+        <div class="screen-desc">Đặt lịch hẹn — Chống trùng giờ ±29 phút</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">👤</span> Chọn / tìm bệnh nhân</div>
+          <div class="screen-comp"><span class="comp-icon">👨‍⚕️</span> ComboBox chọn bác sĩ</div>
+          <div class="screen-comp"><span class="comp-icon">📅</span> DateTimePicker chọn ngày giờ</div>
+          <div class="screen-comp"><span class="comp-icon">📊</span> Xem lịch trống của bác sĩ trong ngày</div>
+          <div class="screen-comp"><span class="comp-icon">⛔</span> Hiển thị lỗi nếu trùng khung giờ</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-blue">SP_DatLichHenMoi</span><span class="pill pill-yellow">RAISERROR chống trùng</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmDanhSachLichHen</div>
+        <div class="screen-desc">Quản lý toàn bộ lịch hẹn: xem, lọc, hủy</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📅</span> Filter theo ngày / bác sĩ / trạng thái</div>
+          <div class="screen-comp"><span class="comp-icon">📋</span> DataGridView lịch hẹn</div>
+          <div class="screen-comp"><span class="comp-icon">❌</span> Button Hủy lịch (TrangThai=0)</div>
+          <div class="screen-comp"><span class="comp-icon">🔔</span> Xác nhận đã đến (TrangThai=1→2)</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-yellow">LichHen</span><span class="pill pill-yellow">CHK TrangThai IN(0,1,2)</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmThanhToan</div>
+        <div class="screen-desc">Thu tiền, áp dụng giảm giá, chọn PTTT</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">📋</span> Danh sách Dịch vụ + Thuốc đã dùng</div>
+          <div class="screen-comp"><span class="comp-icon">💰</span> Hiển thị TongTien tự tính</div>
+          <div class="screen-comp"><span class="comp-icon">🏷️</span> NumericUpDown: Nhập GiamGia</div>
+          <div class="screen-comp"><span class="comp-icon">💳</span> RadioButton: Tiền mặt / Chuyển khoản</div>
+          <div class="screen-comp"><span class="comp-icon">🔢</span> Nhập TienKhachTra → Tính tiền thừa</div>
+          <div class="screen-comp"><span class="comp-icon">✅</span> Xác nhận → UPDATE HoaDon.TrangThai=1</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-yellow">HoaDon</span><span class="pill pill-red">HoaDon_LichSu (Temporal)</span></div>
+      </div>
+
+      <div class="screen-card reception-c">
+        <div class="screen-name" style="color:var(--yellow)">frmInHoaDon</div>
+        <div class="screen-desc">Preview và in hóa đơn, phiếu thu tiền</div>
+        <div class="screen-components">
+          <div class="screen-comp"><span class="comp-icon">👁️</span> PrintPreview hóa đơn</div>
+          <div class="screen-comp"><span class="comp-icon">🖨️</span> PrintDocument phát hóa đơn</div>
+          <div class="screen-comp"><span class="comp-icon">📄</span> Nội dung: BN, DV, Thuốc, Tổng tiền</div>
+        </div>
+        <div class="screen-tech"><span class="pill pill-yellow">System.Drawing.Printing</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 3: MẪU GIAO DIỆN (WIREFRAMES)                           -->
+<!-- ============================================================ -->
+<div id="tab-wireframes" class="tab-panel">
+  <div class="section-title">Mẫu Khung Giao Diện (Wireframes) Các Form Chính</div>
+  <p class="section-desc">Bố cục tham khảo cho từng form quan trọng. Thực hiện bằng WinForms + Guna UI2.</p>
+
+  <div class="wireframe-grid">
+
+    <!-- frmTaoTaiKhoan (ADMIN) -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmTaoTaiKhoan — Admin only ⭐</span>
+      </div>
+      <div class="wf-body">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--purple);margin-bottom:10px;padding:5px 8px;background:rgba(139,92,246,0.1);border-radius:5px;border:1px solid rgba(139,92,246,0.3)">
+          🛡️ Chỉ Admin có quyền truy cập form này
+        </div>
+        <div class="wf-row">
+          <div style="flex:1">
+            <div class="wf-form-group">
+              <div class="wf-label">HỌ TÊN NHÂN VIÊN</div>
+              <div class="wf-elem wf-input" style="width:100%">[ TextBox - HoTen ]</div>
+            </div>
+            <div class="wf-form-group">
+              <div class="wf-label">VAI TRÒ</div>
+              <div class="wf-elem wf-input" style="width:100%">[ ComboBox: Bác sĩ | Lễ tân ]</div>
+            </div>
+          </div>
+          <div style="flex:1;margin-left:8px">
+            <div class="wf-form-group">
+              <div class="wf-label">SỐ ĐIỆN THOẠI</div>
+              <div class="wf-elem wf-input" style="width:100%">[ TextBox - SoDienThoai ]</div>
+            </div>
+            <div class="wf-form-group">
+              <div class="wf-label">EMAIL</div>
+              <div class="wf-elem wf-input" style="width:100%">[ TextBox - Email ]</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-form-group">
+          <div class="wf-label">TÊN ĐĂNG NHẬP <span style="color:var(--green)">(Kiểm tra trùng realtime)</span></div>
+          <div class="wf-row">
+            <div class="wf-elem wf-input" style="flex:1">[ TextBox - TenDangNhap ]</div>
+            <div class="wf-elem" style="font-size:0.6rem;color:var(--green)">✓ Khả dụng</div>
+          </div>
+        </div>
+        <div class="wf-form-group">
+          <div class="wf-label">MẬT KHẨU TẠM (Nhân viên phải đổi lần đầu đăng nhập)</div>
+          <div class="wf-elem wf-input" style="width:100%">[ PasswordBox - MatKhau ]</div>
+        </div>
+        <div style="font-size:0.62rem;color:var(--yellow);padding:5px 8px;background:rgba(245,158,11,0.08);border-radius:5px;border:1px solid rgba(245,158,11,0.2);margin-bottom:8px">
+          ⚠ DoiMatKhau = 1 sẽ được tự động gán — NV bắt buộc đổi MK khi đăng nhập lần đầu
+        </div>
+        <div class="wf-elem wf-btn" style="width:100%;height:30px">➕ TẠO TÀI KHOẢN</div>
+      </div>
+    </div>
+
+    <!-- frmDoiMatKhau -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmDoiMatKhau — Lần đầu đăng nhập</span>
+      </div>
+      <div class="wf-body" style="text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:6px;">🔑</div>
+        <div style="font-size:0.72rem;font-weight:700;color:var(--red);margin-bottom:4px;">ĐỔI MẬT KHẨU BẮT BUỘC</div>
+        <div style="font-size:0.65rem;color:var(--muted);margin-bottom:14px;">Bạn đang đăng nhập lần đầu.<br>Vui lòng đặt mật khẩu mới để tiếp tục.</div>
+        <div class="wf-form-group" style="text-align:left">
+          <div class="wf-label">MẬT KHẨU MỚI (≥ 8 ký tự, có chữ hoa + số)</div>
+          <div class="wf-elem wf-input" style="width:100%">[ PasswordBox ]</div>
+        </div>
+        <div class="wf-form-group" style="text-align:left">
+          <div class="wf-label">XÁC NHẬN MẬT KHẨU MỚI</div>
+          <div class="wf-elem wf-input" style="width:100%">[ PasswordBox ]</div>
+        </div>
+        <div class="wf-elem wf-btn-green" style="width:100%;height:30px;margin-top:4px">✅ XÁC NHẬN & VÀO HỆ THỐNG</div>
+        <div style="font-size:0.6rem;color:var(--muted);margin-top:6px">Không thể bỏ qua bước này</div>
+      </div>
+    </div>
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmDangNhap — Login Screen</span>
+      </div>
+      <div class="wf-body" style="text-align:center;padding:20px;">
+        <div style="font-size:2rem;margin-bottom:8px;">🏥</div>
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:16px;">PHÒNG KHÁM DA LIỄU</div>
+        <div class="wf-form-group" style="text-align:left">
+          <div class="wf-label">TÊN ĐĂNG NHẬP</div>
+          <div class="wf-elem wf-input" style="width:100%">[ TextBox - TenDangNhap ]</div>
+        </div>
+        <div class="wf-form-group" style="text-align:left">
+          <div class="wf-label">MẬT KHẨU</div>
+          <div class="wf-elem wf-input" style="width:100%">[ PasswordBox - MatKhau ]</div>
+        </div>
+        <div class="wf-elem wf-btn" style="width:100%;height:32px;margin-top:8px">ĐĂNG NHẬP</div>
+        <div style="font-size:0.62rem;color:var(--muted);margin-top:10px">Phân quyền tự động theo MaVaiTro</div>
+      </div>
+    </div>
+
+    <!-- frmDashboard_Admin -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmDashboard_Admin</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-row">
+          <div class="wf-elem" style="width:120px;flex-direction:column;gap:4px;height:auto;padding:8px;">
+            <div class="wf-sidebar-item active">📊 Tổng quan</div>
+            <div class="wf-sidebar-item">👥 Nhân viên</div>
+            <div class="wf-sidebar-item">📦 Kho hàng</div>
+            <div class="wf-sidebar-item">💰 Tài chính</div>
+            <div class="wf-sidebar-item">🛡️ Audit</div>
+          </div>
+          <div style="flex:1">
+            <div class="wf-row">
+              <div class="wf-stat"><div class="wf-stat-num" style="color:var(--accent)">12</div><div class="wf-stat-lbl">BN hôm nay</div></div>
+              <div class="wf-stat"><div class="wf-stat-num" style="color:var(--green)">8.5M</div><div class="wf-stat-lbl">Doanh thu</div></div>
+              <div class="wf-stat"><div class="wf-stat-num" style="color:var(--red)">2</div><div class="wf-stat-lbl">Hết hàng</div></div>
+            </div>
+            <div class="wf-elem" style="height:60px;margin-top:8px;width:100%">[ Chart: Doanh thu 7 ngày ]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- frmDanhSachChoKham -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmDanhSachChoKham — Bác sĩ</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-row">
+          <div class="wf-elem wf-input" style="flex:1">🔍 Tìm bệnh nhân...</div>
+          <div class="wf-elem" style="padding:4px 8px;font-size:0.62rem;color:var(--green)">⏱ Auto-refresh 30s</div>
+        </div>
+        <table class="wf-table" style="margin-top:8px">
+          <tr><th>STT</th><th>Họ tên</th><th>Giờ đến</th><th>Triệu chứng</th><th>Thao tác</th></tr>
+          <tr><td>1</td><td>Nguyễn Văn A</td><td>09:00</td><td>Nổi mụn má</td><td><span class="wf-badge wf-status-wait">Chờ</span></td></tr>
+          <tr><td>2</td><td>Trần Thị B</td><td>09:30</td><td>Sạm nám</td><td><span class="wf-badge wf-status-wait">Chờ</span></td></tr>
+        </table>
+        <div class="wf-row" style="margin-top:8px">
+          <div class="wf-elem wf-btn" style="flex:1">▶ Gọi khám</div>
+          <div class="wf-elem wf-btn-green" style="flex:1">✅ Đã xong</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- frmKhamBenh -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmKhamBenh — Bác sĩ</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-row">
+          <div style="flex:1">
+            <div class="wf-form-group">
+              <div class="wf-label">TRIỆU CHỨNG</div>
+              <div class="wf-area">Nổi nhiều mụn viêm sưng đỏ ở má...</div>
+            </div>
+            <div class="wf-form-group">
+              <div class="wf-label">CHẨN ĐOÁN</div>
+              <div class="wf-area">Mụn trứng cá cấp độ 3...</div>
+            </div>
+            <div class="wf-row">
+              <div style="flex:1"><div class="wf-label">NGÀY TÁI KHÁM</div><div class="wf-elem wf-input">[ DatePicker ]</div></div>
+            </div>
+          </div>
+          <div style="width:110px;display:flex;flex-direction:column;gap:6px">
+            <div class="wf-img">📷 Ảnh Trước</div>
+            <div class="wf-img">📷 Ảnh Sau</div>
+          </div>
+        </div>
+        <div class="wf-row" style="margin-top:8px">
+          <div class="wf-elem wf-btn" style="flex:1">💊 Kê đơn</div>
+          <div class="wf-elem wf-btn-green" style="flex:1">💾 Lưu</div>
+          <div class="wf-elem wf-btn-yellow" style="flex:1">✅ Xong khám</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- frmKeDonThuoc -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmKeDonThuoc — FIFO</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-row">
+          <div class="wf-elem wf-input" style="flex:2">🔍 Tìm thuốc...</div>
+          <div class="wf-elem" style="flex:1">Tồn: <span style="color:var(--green)">30</span></div>
+        </div>
+        <div class="wf-row" style="margin-top:6px">
+          <div class="wf-elem wf-input" style="flex:1">Số lượng kê</div>
+          <div class="wf-elem wf-input" style="flex:2">Liều dùng hướng dẫn...</div>
+          <div class="wf-elem wf-btn">+ Thêm</div>
+        </div>
+        <table class="wf-table" style="margin-top:8px">
+          <tr><th>Thuốc</th><th>SL</th><th>Liều dùng</th><th>Xóa</th></tr>
+          <tr><td>Differin 0.1%</td><td>1</td><td>Bôi tối</td><td style="color:var(--red)">🗑</td></tr>
+          <tr><td>Cetaphil 500ml</td><td>1</td><td>Rửa 2 lần/ngày</td><td style="color:var(--red)">🗑</td></tr>
+        </table>
+        <div class="wf-elem wf-btn-green" style="margin-top:8px;width:100%;height:28px">✅ Xác nhận kê đơn (SP_FIFO)</div>
+      </div>
+    </div>
+
+    <!-- frmTiepNhanBenhNhan -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmTiepNhanBenhNhan — Lễ tân</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-row">
+          <div class="wf-elem wf-input" style="flex:2">🔍 Tìm theo SĐT...</div>
+          <div class="wf-elem wf-btn">Tìm</div>
+          <div class="wf-elem wf-btn-green">+ Bệnh nhân mới</div>
+        </div>
+        <div style="margin-top:10px;padding:8px;background:var(--surface2);border-radius:6px;">
+          <div style="font-size:0.7rem;font-weight:700;color:var(--yellow);margin-bottom:6px">THÔNG TIN BỆNH NHÂN</div>
+          <div class="wf-row"><div class="wf-elem wf-input" style="flex:1">Họ tên</div><div class="wf-elem wf-input" style="flex:1">Ngày sinh</div></div>
+          <div class="wf-row" style="margin-top:4px"><div class="wf-elem wf-input" style="flex:1">SĐT</div><div class="wf-elem wf-input" style="flex:1">Giới tính</div></div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="wf-label">CHỌN BÁC SĨ KHÁM</div>
+          <div class="wf-elem wf-input" style="width:100%">[ ComboBox - NhanVien (MaVaiTro=2) ]</div>
+        </div>
+        <div class="wf-elem wf-btn" style="width:100%;height:32px;margin-top:8px">🏥 XÁC NHẬN TIẾP NHẬN (Transaction)</div>
+      </div>
+    </div>
+
+    <!-- frmThanhToan -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmThanhToan — Lễ tân</span>
+      </div>
+      <div class="wf-body">
+        <table class="wf-table">
+          <tr><th>Khoản</th><th>SL</th><th>Đơn giá</th><th>T.Tiền</th></tr>
+          <tr><td>Khám da liễu</td><td>1</td><td>150k</td><td>150k</td></tr>
+          <tr><td>Lấy nhân mụn</td><td>1</td><td>300k</td><td>300k</td></tr>
+          <tr><td>Differin 0.1%</td><td>1</td><td>280k</td><td>280k</td></tr>
+        </table>
+        <div style="margin-top:8px;padding:8px;background:var(--surface2);border-radius:6px;">
+          <div class="wf-row">
+            <span style="font-size:0.7rem;color:var(--muted)">Tổng tiền</span>
+            <span style="font-size:0.85rem;font-weight:700;margin-left:auto;color:var(--text)">730.000đ</span>
+          </div>
+          <div class="wf-row">
+            <span style="font-size:0.7rem;color:var(--muted)">Giảm giá</span>
+            <div class="wf-elem wf-input" style="flex:0;width:80px;height:22px;font-size:0.65rem">0</div>
+          </div>
+          <div class="wf-row">
+            <span style="font-size:0.7rem;color:var(--green);font-weight:700">Khách trả</span>
+            <div class="wf-elem wf-input" style="flex:0;width:100px;height:22px;font-size:0.65rem">800.000</div>
+          </div>
+        </div>
+        <div class="wf-row" style="margin-top:8px">
+          <div class="wf-elem wf-btn" style="flex:1">💵 Tiền mặt</div>
+          <div class="wf-elem" style="flex:1">📱 Chuyển khoản</div>
+        </div>
+        <div class="wf-elem wf-btn-green" style="width:100%;height:30px;margin-top:6px">✅ XÁC NHẬN THU TIỀN</div>
+      </div>
+    </div>
+
+    <!-- frmDatLichHen -->
+    <div class="wireframe">
+      <div class="wf-titlebar">
+        <div class="wf-dots"><div class="wf-dot" style="background:#ef4444"></div><div class="wf-dot" style="background:#f59e0b"></div><div class="wf-dot" style="background:#10b981"></div></div>
+        <span class="wf-name">frmDatLichHen — Lễ tân</span>
+      </div>
+      <div class="wf-body">
+        <div class="wf-form-group">
+          <div class="wf-label">BỆNH NHÂN</div>
+          <div class="wf-elem wf-input" style="width:100%">[ AutoComplete - BenhNhan ]</div>
+        </div>
+        <div class="wf-form-group">
+          <div class="wf-label">BÁC SĨ KHÁM</div>
+          <div class="wf-elem wf-input" style="width:100%">[ ComboBox - NhanVien BS ]</div>
+        </div>
+        <div class="wf-form-group">
+          <div class="wf-label">NGÀY GIỜ HẸN</div>
+          <div class="wf-elem wf-input" style="width:100%">[ DateTimePicker ]</div>
+        </div>
+        <div style="padding:8px;background:rgba(16,185,129,0.08);border-radius:6px;border:1px solid rgba(16,185,129,0.2);font-size:0.65rem;color:var(--green);margin-bottom:8px">
+          📋 Lịch trống BS trong ngày: 08:00, 09:30, 14:00, 15:30...
+        </div>
+        <div class="wf-elem wf-btn" style="width:100%;height:30px">📅 ĐẶT LỊCH (SP_DatLichHenMoi)</div>
+        <div style="margin-top:4px;font-size:0.6rem;color:var(--red);text-align:center">⚠ Hệ thống tự chặn nếu trùng ±30 phút</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 4: LUỒNG DỮ LIỆU                                        -->
+<!-- ============================================================ -->
+<div id="tab-data" class="tab-panel">
+  <div class="section-title">Luồng Dữ Liệu Giữa Các Bảng & Thành Phần Kỹ Thuật</div>
+  <p class="section-desc">Bảng tra cứu: Form nào → gọi gì → tác động bảng nào → kỹ thuật DB nào được dùng.</p>
+
+  <table class="data-flow-table">
+    <thead>
+      <tr>
+        <th>Form</th>
+        <th>Vai trò</th>
+        <th>Bảng đọc (SELECT)</th>
+        <th>Bảng ghi (INSERT/UPDATE)</th>
+        <th>Kỹ thuật DB</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>frmTaoTaiKhoan ⭐</b></td>
+        <td><span class="pill pill-purple">Admin</span></td>
+        <td><span class="pill pill-blue">VaiTro</span> <span class="pill pill-blue">NhanVien (kiểm tra trùng)</span></td>
+        <td><span class="pill pill-green">NhanVien</span> (HoTen, SĐT, Email, TenDangNhap, MatKhau, MaVaiTro, TrangThaiTK=1, DoiMatKhau=1)</td>
+        <td><span class="pill pill-purple">INSERT + UNIQUE check</span> <span class="pill pill-blue">Hash BCrypt</span></td>
+      </tr>
+      <tr>
+        <td><b>frmQuanLyTaiKhoan ⭐</b></td>
+        <td><span class="pill pill-purple">Admin</span></td>
+        <td><span class="pill pill-blue">NhanVien</span> <span class="pill pill-blue">VaiTro</span></td>
+        <td><span class="pill pill-green">NhanVien.TrangThaiTK</span> <span class="pill pill-green">NhanVien.MatKhau (reset)</span> <span class="pill pill-green">NhanVien.DoiMatKhau</span></td>
+        <td><span class="pill pill-purple">UPDATE NhanVien</span></td>
+      </tr>
+      <tr>
+        <td><b>frmDoiMatKhau ⭐</b></td>
+        <td><span class="pill pill-blue">Tất cả (lần đầu)</span></td>
+        <td>—</td>
+        <td><span class="pill pill-green">NhanVien.MatKhau</span> <span class="pill pill-green">NhanVien.DoiMatKhau = 0</span></td>
+        <td><span class="pill pill-blue">UPDATE + Hash BCrypt</span> <span class="pill pill-red">Bắt buộc DoiMatKhau=1</span></td>
+      </tr>
+      <tr>
+        <td><b>frmDangNhap</b></td>
+        <td><span class="pill pill-blue">Tất cả</span></td>
+        <td><span class="pill pill-blue">NhanVien</span> <span class="pill pill-blue">VaiTro</span></td>
+        <td>—</td>
+        <td><span class="pill pill-purple">SELECT + JOIN</span> <span class="pill pill-red">CHECK TrangThaiTK=1</span></td>
+      </tr>
+      <tr>
+        <td><b>frmTiepNhanBenhNhan</b></td>
+        <td><span class="pill pill-yellow">Lễ tân</span></td>
+        <td><span class="pill pill-blue">BenhNhan</span> <span class="pill pill-blue">NhanVien</span></td>
+        <td><span class="pill pill-green">BenhNhan</span> <span class="pill pill-green">PhieuKham</span> <span class="pill pill-green">ChiTietDichVu</span> <span class="pill pill-green">HoaDon</span></td>
+        <td><span class="pill pill-blue">SP_TiepNhanBenhNhan_AnToan</span> <span class="pill pill-yellow">TRANSACTION</span></td>
+      </tr>
+      <tr>
+        <td><b>frmDatLichHen</b></td>
+        <td><span class="pill pill-yellow">Lễ tân</span></td>
+        <td><span class="pill pill-blue">BenhNhan</span> <span class="pill pill-blue">NhanVien</span> <span class="pill pill-blue">LichHen</span></td>
+        <td><span class="pill pill-green">LichHen</span></td>
+        <td><span class="pill pill-blue">SP_DatLichHenMoi</span> <span class="pill pill-red">RAISERROR chống trùng</span></td>
+      </tr>
+      <tr>
+        <td><b>frmDanhSachChoKham</b></td>
+        <td><span class="pill pill-green">Bác sĩ</span></td>
+        <td><span class="pill pill-blue">PhieuKham</span> <span class="pill pill-blue">BenhNhan</span></td>
+        <td>—</td>
+        <td><span class="pill pill-purple">Timer.Tick Auto-Refresh</span></td>
+      </tr>
+      <tr>
+        <td><b>frmKhamBenh</b></td>
+        <td><span class="pill pill-green">Bác sĩ</span></td>
+        <td><span class="pill pill-blue">PhieuKham</span> <span class="pill pill-blue">DichVu</span> <span class="pill pill-blue">BenhNhan</span></td>
+        <td><span class="pill pill-green">PhieuKham</span> <span class="pill pill-green">ChiTietDichVu</span></td>
+        <td><span class="pill pill-red">Temporal Table → PhieuKham_LichSu</span></td>
+      </tr>
+      <tr>
+        <td><b>frmKeDonThuoc</b></td>
+        <td><span class="pill pill-green">Bác sĩ</span></td>
+        <td><span class="pill pill-blue">Thuoc</span> <span class="pill pill-blue">ChiTietNhapKho</span></td>
+        <td><span class="pill pill-green">ChiTietDonThuoc</span> <span class="pill pill-green">Thuoc.SoLuongTon</span> <span class="pill pill-green">ChiTietNhapKho.SoLuongConLai</span></td>
+        <td><span class="pill pill-blue">SP_KeDonThuoc_FIFO</span> <span class="pill pill-yellow">CURSOR FIFO</span> <span class="pill pill-yellow">TRANSACTION</span></td>
+      </tr>
+      <tr>
+        <td><b>frmHoSoBenhAn</b></td>
+        <td><span class="pill pill-green">Bác sĩ</span></td>
+        <td><span class="pill pill-blue">VW_HoSoBenhAn</span> <span class="pill pill-blue">ChiTietDonThuoc</span></td>
+        <td>—</td>
+        <td><span class="pill pill-green">VIEW VW_HoSoBenhAn</span></td>
+      </tr>
+      <tr>
+        <td><b>frmThanhToan</b></td>
+        <td><span class="pill pill-yellow">Lễ tân</span></td>
+        <td><span class="pill pill-blue">HoaDon</span> <span class="pill pill-blue">ChiTietDichVu</span> <span class="pill pill-blue">ChiTietDonThuoc</span></td>
+        <td><span class="pill pill-green">HoaDon.TrangThai=1</span> <span class="pill pill-green">LichHen.TrangThai=2</span></td>
+        <td><span class="pill pill-red">Temporal Table → HoaDon_LichSu</span></td>
+      </tr>
+      <tr>
+        <td><b>frmNhapKho</b></td>
+        <td><span class="pill pill-purple">Admin</span></td>
+        <td><span class="pill pill-blue">NhaCungCap</span> <span class="pill pill-blue">Thuoc</span></td>
+        <td><span class="pill pill-green">PhieuNhapKho</span> <span class="pill pill-green">ChiTietNhapKho</span> <span class="pill pill-green">Thuoc.SoLuongTon (+)</span></td>
+        <td><span class="pill pill-red">TRG_NhapKho_CapNhatTon</span></td>
+      </tr>
+      <tr>
+        <td><b>frmBaoCaoDoanhThu</b></td>
+        <td><span class="pill pill-purple">Admin</span></td>
+        <td><span class="pill pill-blue">VW_BaoCaoDoanhThu</span> <span class="pill pill-blue">ChiPhiHoatDong</span></td>
+        <td>—</td>
+        <td><span class="pill pill-green">VIEW VW_BaoCaoDoanhThu</span></td>
+      </tr>
+      <tr>
+        <td><b>frmAuditTrail</b></td>
+        <td><span class="pill pill-purple">Admin</span></td>
+        <td><span class="pill pill-blue">PhieuKham_LichSu</span> <span class="pill pill-blue">HoaDon_LichSu</span></td>
+        <td>—</td>
+        <td><span class="pill pill-red">System-Versioned Temporal Tables</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:32px">
+    <div class="section-title">Tóm Tắt Các Thành Phần Kỹ Thuật DB Được Dùng</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px">
+      <div class="detail-card" style="border-color:rgba(239,68,68,0.3)">
+        <div class="detail-card-title" style="color:var(--red)">🔴 Triggers (2)</div>
+        <ul>
+          <li><code>TRG_NhapKho_CapNhatTon</code>: Cộng SoLuongTon khi nhập kho</li>
+          <li><code>TRG_KeDon_TruTonKho</code>: (cũ, thay bằng SP_FIFO)</li>
+          <li>Temporal Table tự ghi lịch sử PhieuKham & HoaDon</li>
+        </ul>
+      </div>
+      <div class="detail-card" style="border-color:rgba(14,165,233,0.3)">
+        <div class="detail-card-title" style="color:var(--accent)">🔵 Stored Procedures (3)</div>
+        <ul>
+          <li><code>SP_DatLichHenMoi</code>: Chống trùng ±29 phút</li>
+          <li><code>SP_KeDonThuoc_FIFO</code>: Xuất kho FEFO + chống âm</li>
+          <li><code>SP_TiepNhanBenhNhan_AnToan</code>: ACID transaction</li>
+        </ul>
+      </div>
+      <div class="detail-card" style="border-color:rgba(16,185,129,0.3)">
+        <div class="detail-card-title" style="color:var(--green)">🟢 Views (2)</div>
+        <ul>
+          <li><code>VW_HoSoBenhAn</code>: JOIN PhieuKham + BN + BS</li>
+          <li><code>VW_BaoCaoDoanhThu</code>: JOIN HoaDon + PhieuKham + BN</li>
+        </ul>
+      </div>
+      <div class="detail-card" style="border-color:rgba(245,158,11,0.3)">
+        <div class="detail-card-title" style="color:var(--yellow)">🟡 Transactions & Constraints</div>
+        <ul>
+          <li>BEGIN TRAN / COMMIT / ROLLBACK trong SP</li>
+          <li>CHK_ThoiGianCa, CHK_Thuoc_TonKho</li>
+          <li>CHK_TrangThaiLich IN(0,1,2)</li>
+          <li>UNIQUE: SoDienThoai, TenDangNhap, MaPhieuKham(HoaDon)</li>
+        </ul>
+      </div>
+      <div class="detail-card" style="border-color:rgba(139,92,246,0.3)">
+        <div class="detail-card-title" style="color:var(--purple)">🟣 Temporal Tables (Audit)</div>
+        <ul>
+          <li><code>PhieuKham_LichSu</code>: Chống sửa chẩn đoán lén</li>
+          <li><code>HoaDon_LichSu</code>: Chống gian lận tài chính</li>
+          <li>System-Versioned với ThoiGianBatDau / ThoiGianKetThuc</li>
+        </ul>
+      </div>
+      <div class="detail-card" style="border-color:rgba(239,68,68,0.3);grid-column:1/-1">
+        <div class="detail-card-title" style="color:var(--red)">🔴 SQL Patch Cần Bổ Sung Vào NhanVien (Hỗ trợ luồng đăng ký / đăng nhập)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--accent);margin-bottom:4px;">Thêm cột vào bảng NhanVien:</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;background:var(--bg);padding:10px;border-radius:6px;color:#93c5fd;line-height:1.8;">
+              ALTER TABLE NhanVien<br>
+              ADD TrangThaiTK BIT DEFAULT 1,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;DoiMatKhau BIT DEFAULT 1;<br>
+              -- TrangThaiTK: 1=Hoạt động, 0=Khóa<br>
+              -- DoiMatKhau: 1=Bắt buộc đổi MK lần đầu
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--accent);margin-bottom:4px;">Thêm cột TrangThai vào PhieuKham + MaLichHen FK:</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;background:var(--bg);padding:10px;border-radius:6px;color:#93c5fd;line-height:1.8;">
+              ALTER TABLE PhieuKham<br>
+              ADD TrangThai TINYINT DEFAULT 0,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;MaLichHen INT NULL,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;FOREIGN KEY (MaLichHen)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;REFERENCES LichHen(MaLichHen);<br>
+              -- 0:Chờ, 1:Đang khám, 2:Xong, 3:Đã TT
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--accent);margin-bottom:4px;">Tạo bảng HinhAnhBenhLy (lưu ảnh bệnh lý):</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;background:var(--bg);padding:10px;border-radius:6px;color:#93c5fd;line-height:1.8;">
+              CREATE TABLE HinhAnhBenhLy (<br>
+              &nbsp;&nbsp;MaHinhAnh INT IDENTITY(1,1) PK,<br>
+              &nbsp;&nbsp;MaPhieuKham INT NOT NULL FK,<br>
+              &nbsp;&nbsp;DuongDanAnh NVARCHAR(500) NOT NULL,<br>
+              &nbsp;&nbsp;GhiChu NVARCHAR(200),<br>
+              &nbsp;&nbsp;NgayChup DATETIME DEFAULT GETDATE()<br>
+              );
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--accent);margin-bottom:4px;">Fix SP_TiepNhan: lấy giá động thay vì hardcode:</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;background:var(--bg);padding:10px;border-radius:6px;color:#93c5fd;line-height:1.8;">
+              -- Thêm tham số vào SP:<br>
+              @MaDichVuCoBan INT = 1<br>
+              -- Lấy giá từ DB:<br>
+              DECLARE @GiaCoBan DECIMAL(18,2);<br>
+              SELECT @GiaCoBan = DonGia<br>
+              FROM DichVu WHERE MaDichVu = @MaDichVuCoBan;<br>
+              -- Dùng @GiaCoBan thay vì 150000
+            </div>
+          </div>
+        </div>
+      </div>
+        <ul>
+          <li>Timer.Tick cho auto-refresh danh sách chờ</li>
+          <li>Text_Changed cho lọc realtime DataGridView</li>
+          <li>CURSOR FIFO trong SP xuất kho theo HanSuDung ASC</li>
+          <li>OpenFileDialog + System.Drawing cho quản lý ảnh</li>
+          <li>PrintDocument cho in hóa đơn</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .content -->
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>
